@@ -12,7 +12,6 @@ setup(name='yahoo_quote_download',
 	],
 	zip_safe=False,
 	entry_points = {
-		'console_scripts': [
-		],
+		'console_scripts': [ 'yqd=yahoo_quote_download.__main__:main' ],
 	},
 )
