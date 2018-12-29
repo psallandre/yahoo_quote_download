@@ -51,7 +51,7 @@ class YahooQuote(object):
         self.session.cookies.clear()
         return cookie, crumb.decode()
 
-    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True):
+    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, once=True):
         if isinstance(tickers, str):
             tickers = tickers,
 
@@ -76,5 +76,6 @@ class YahooQuote(object):
                 if headers and not header_shown:
                     yield 'Symbol,' + row
                     header_shown = True
-                elif jj>0:
+                elif not once or (jj==len(rows)-1):
                     yield ','.join((ticker, row))
+                    if once: break
