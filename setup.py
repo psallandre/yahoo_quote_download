@@ -8,7 +8,7 @@ setup(name='yahoo_quote_download',
 	author='c0redumb',
 	packages=['yahoo_quote_download'],
 	install_requires=[
-		'six',
+		'requests',
 	],
 	zip_safe=False,
 	entry_points = {
