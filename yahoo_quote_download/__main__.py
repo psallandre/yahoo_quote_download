@@ -6,7 +6,9 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('-H', '--no-header', default=True, dest='header')
     p.add_argument('-e', '--events', choices=('history','div','split'), default='history')
-    p.add_argument('-d', '--days', type=int, default=1)
+    x = p.add_mutually_exclusive_group()
+    x.add_argument('-d', '--days', type=int, default=1, help='Number of days of results to return (default %(default)s)')
+    x.add_argument('-L', '--latest', action='store_true', help='Just return the one most-recent row for each ticker')
     p.add_argument('ticker', nargs='+')
     args = p.parse_args()
 
@@ -20,7 +22,11 @@ def main():
         open(os.path.expanduser("~/.yahooquotes"),'w').write('\n'.join(yq.cookie_crumb))
         print("Cached cookie_crumb in ~/.yahooquotes", file=sys.stderr)
 
-    sys.stdout.writelines( yq.csv(args.ticker, events=args.events, headers=args.header, begindate=int(time.time()-86400*args.days)) )
+    if args.latest:
+        begindate, max_rows = None, 1
+    else:
+        max_rows, begindate = None, int(time.time()-86400*args.days)
+    sys.stdout.writelines( yq.csv(args.ticker, events=args.events, headers=args.header, begindate=begindate, max_rows=max_rows) )
 
 if __name__=='__main__':
     main()
