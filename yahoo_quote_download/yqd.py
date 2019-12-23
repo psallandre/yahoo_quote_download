@@ -51,7 +51,7 @@ class YahooQuote(object):
         self.session.cookies.clear()
         return cookie, crumb.decode()
 
-    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, once=True, autoextend_days=7):
+    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7):
         if isinstance(tickers, str):
             tickers = tickers,
 
@@ -65,7 +65,6 @@ class YahooQuote(object):
         self.session.cookies['B'] = cookie
         #print(self.session.cookies)
 
-        header_shown = False
         for ii, ticker in enumerate(tickers):
             found = False
             while True:
@@ -85,9 +84,11 @@ class YahooQuote(object):
             #print(r.cookies, r.url)
             rows = r.text.splitlines(True)
             for jj, row in enumerate(rows):
-                if headers and not header_shown:
-                    yield 'Symbol,' + row
-                    header_shown = True
-                elif not once or (jj==len(rows)-1):
+                if jj == 0:
+                    # only include the header row in output once
+                    if headers:
+                        yield 'Symbol,' + row
+                        headers = False
+                elif max_rows == None or jj>=len(rows)-max_rows:
+                    # limit number of rows to max_rows
                     yield ','.join((ticker, row))
-                    if once: break
