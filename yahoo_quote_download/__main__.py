@@ -16,8 +16,9 @@ def main():
     except Exception:
         cookie_crumb = None
     yq = YahooQuote(cookie_crumb)
-    open(os.path.expanduser("~/.yahooquotes"),'w').write('\n'.join(yq.cookie_crumb))
-    print("Cached cookie_crumb in ~/.yahooquotes", file=sys.stderr)
+    if yq.cookie_crumb != cookie_crumb:
+        open(os.path.expanduser("~/.yahooquotes"),'w').write('\n'.join(yq.cookie_crumb))
+        print("Cached cookie_crumb in ~/.yahooquotes", file=sys.stderr)
 
     sys.stdout.writelines( yq.csv(args.ticker, events=args.events, headers=args.header, begindate=int(time.time()-86400*args.days)) )
 
