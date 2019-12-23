@@ -51,7 +51,7 @@ class YahooQuote(object):
         self.session.cookies.clear()
         return cookie, crumb.decode()
 
-    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, once=True):
+    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, once=True, autoextend_days=7):
         if isinstance(tickers, str):
             tickers = tickers,
 
@@ -67,9 +67,21 @@ class YahooQuote(object):
 
         header_shown = False
         for ii, ticker in enumerate(tickers):
-            r = self.session.get('https://query1.finance.yahoo.com/v7/finance/download/' + ticker,
-                                 params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=crumb))
-            r.raise_for_status()
+            found = False
+            while True:
+                r = self.session.get('https://query1.finance.yahoo.com/v7/finance/download/' + ticker,
+                                     params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=crumb))
+                if r.ok:
+                    break
+                elif r.status_code == 404 and autoextend_days > 0:
+                    # go back one more day
+                    begindate -= 86400
+                    autoextend_days -= 1
+                elif r.status_code == 404:
+                    # ignore
+                    break
+                else:
+                    r.raise_for_status()
             #print(r.cookies, r.url)
             rows = r.text.splitlines(True)
             for jj, row in enumerate(rows):
