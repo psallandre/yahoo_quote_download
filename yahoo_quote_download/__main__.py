@@ -4,7 +4,7 @@ from .yqd import YahooQuote
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('-H', '--no-header', default=True, dest='header')
+    p.add_argument('-H', '--no-header', action='store_false', default=True, dest='header')
     p.add_argument('-e', '--events', choices=('history','div','split'), default='history')
     x = p.add_mutually_exclusive_group()
     x.add_argument('-d', '--days', type=int, default=1, help='Number of days of results to return (default %(default)s)')
