@@ -82,7 +82,7 @@ class YahooQuote(object):
                 else:
                     r.raise_for_status()
             #print(r.cookies, r.url)
-            rows = r.text.splitlines(True)
+            rows = r.text.splitlines()
             for jj, row in enumerate(rows):
                 if jj == 0:
                     # only include the header row in output once
@@ -91,4 +91,4 @@ class YahooQuote(object):
                         headers = False
                 elif max_rows == None or jj>=len(rows)-max_rows:
                     # limit number of rows to max_rows
-                    yield ','.join((ticker, row))
+                    yield ','.join((ticker, row))+'\n'
