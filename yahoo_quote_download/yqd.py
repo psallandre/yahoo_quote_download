@@ -87,7 +87,7 @@ class YahooQuote(object):
                 if jj == 0:
                     # only include the header row in output once
                     if headers:
-                        yield 'Symbol,' + row
+                        yield 'Symbol,%s\n' % row
                         headers = False
                 elif max_rows == None or jj>=len(rows)-max_rows:
                     # limit number of rows to max_rows
