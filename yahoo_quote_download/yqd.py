@@ -83,6 +83,10 @@ class YahooQuote(object):
                     r.raise_for_status()
             #print(r.cookies, r.url)
             rows = r.text.splitlines()
+
+            # Remove all-'null' rows that YQ is now sometimes returning
+            rows = [row for jj, row in enumerate(rows) if jj==0 or not all(f in ('null','',None) for f in row.split(',')[1:])]
+
             for jj, row in enumerate(rows):
                 if jj == 0:
                     # only include the header row in output once
