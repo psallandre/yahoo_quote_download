@@ -21,7 +21,7 @@ These download links uses a "crumb" for authentication with a cookie "B".
 This code is provided to obtain such matching cookie and crumb.
 '''
 
-default_useragent = 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.12'
+default_useragent = 'Mozilla/5.0 (X11; U; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0'
 
 class YahooQuote(object):
     def __init__(self, cookie_crumb=None, useragent=default_useragent):
