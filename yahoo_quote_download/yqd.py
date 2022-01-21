@@ -51,7 +51,7 @@ class YahooQuote(object):
         self.session.cookies.clear()
         return cookie, crumb.decode()
 
-    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7):
+    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7, sep=','):
         if isinstance(tickers, str):
             tickers = tickers,
 
@@ -82,17 +82,17 @@ class YahooQuote(object):
                 else:
                     r.raise_for_status()
             #print(r.cookies, r.url)
-            rows = r.text.splitlines()
+            rows = [row.split(',') for row in r.text.splitlines()]
 
             # Remove all-'null' rows that YQ is now sometimes returning
-            rows = [row for jj, row in enumerate(rows) if jj==0 or not all(f in ('null','',None) for f in row.split(',')[1:])]
+            rows = [row for jj, row in enumerate(rows) if jj==0 or not all(f in ('null','',None) for f in row[1:])]
 
             for jj, row in enumerate(rows):
                 if jj == 0:
                     # only include the header row in output once
                     if headers:
-                        yield 'Symbol,%s\n' % row
+                        yield sep.join(['Symbol'] + row)+'\n'
                         headers = False
                 elif max_rows == None or jj>=len(rows)-max_rows:
                     # limit number of rows to max_rows
-                    yield ','.join((ticker, row))+'\n'
+                    yield sep.join([ticker] + row)+'\n'
