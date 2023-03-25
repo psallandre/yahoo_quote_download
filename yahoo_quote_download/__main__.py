@@ -1,11 +1,12 @@
 import os, sys, time
 import argparse
-from .yqd import YahooQuote
+from .yqd import YahooQuote, EventType
 
 def main():
+    ets = [et._value_ for et in EventType]
     p = argparse.ArgumentParser()
     p.add_argument('-H', '--no-header', action='store_false', default=True, dest='header')
-    p.add_argument('-e', '--events', choices=('history','div','split'), default='history')
+    p.add_argument('-e', '--events', choices=ets, default=ets[0])
     x = p.add_mutually_exclusive_group()
     x.add_argument('-d', '--days', type=int, default=1, help='Number of days of results to return (default %(default)s)')
     x.add_argument('-L', '--latest', action='store_true', help='Just return the one most-recent row for each ticker')
@@ -21,7 +22,8 @@ def main():
         cookie_crumb = None
     yq = YahooQuote(cookie_crumb)
     if yq.cookie_crumb != cookie_crumb:
-        open(os.path.expanduser("~/.yahooquotes"),'w').write('\n'.join(yq.cookie_crumb))
+        with open(os.path.expanduser("~/.yahooquotes"), 'w') as f:
+            f.write('\n'.join(yq.cookie_crumb))
         print("Cached cookie_crumb in ~/.yahooquotes", file=sys.stderr)
 
     if args.latest:

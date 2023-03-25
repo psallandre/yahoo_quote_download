@@ -9,6 +9,7 @@ Created on Thu May 18 22:58:12 2017
 from __future__ import print_function
 import requests
 import time
+from enum import Enum
 from os.path import expanduser
 
 '''
@@ -22,6 +23,11 @@ This code is provided to obtain such matching cookie and crumb.
 '''
 
 default_useragent = 'Mozilla/5.0 (X11; U; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0'
+
+class EventType(Enum):
+    QUOTE = HISTORY = 'history'
+    DIVIDEND = DIV = 'div'
+    SPLIT = 'split'
 
 class YahooQuote(object):
     def __init__(self, cookie_crumb=None, useragent=default_useragent):
@@ -51,9 +57,11 @@ class YahooQuote(object):
         self.session.cookies.clear()
         return cookie, crumb.decode()
 
-    def csv(self, tickers, events='history', begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7, sep=','):
+    def csv(self, tickers, events=EventType.QUOTE, begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7, sep=','):
         if isinstance(tickers, str):
             tickers = tickers,
+        if isinstance(events, EventType):
+            events = events._value_
 
         now = int(time.time())
         if enddate is None:

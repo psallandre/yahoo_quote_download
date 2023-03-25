@@ -3,8 +3,8 @@
 import sys
 from setuptools import setup
 
-if sys.version_info < (3, 0):
-    sys.exit("Python 2.x is not supported; Python 3.x is required.")
+if sys.version_info < (3, 4):
+    sys.exit("Python >=3.4 is required.")
 
 setup(
     name='yahoo_quote_download',
