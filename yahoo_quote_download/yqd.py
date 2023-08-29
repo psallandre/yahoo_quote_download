@@ -22,7 +22,7 @@ These download links uses a "crumb" for authentication with a cookie "B".
 This code is provided to obtain such matching cookie and crumb.
 '''
 
-default_useragent = 'Mozilla/5.0 (X11; U; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0'
+default_useragent = 'Mozilla/5.0 (X11; U; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0'
 
 class EventType(Enum):
     QUOTE = HISTORY = 'history'
