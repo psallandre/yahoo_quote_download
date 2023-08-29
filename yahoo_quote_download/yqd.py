@@ -43,15 +43,14 @@ class YahooQuote(object):
         r = self.session.get('https://finance.yahoo.com/quote/^GSPC')
 
         # Extract the crumb from the response (it's part of a massive ugly blob of JSON)
-        cs = r.content.find(b'CrumbStore')
-        cr = r.content.find(b'crumb', cs + 10)
-        cl = r.content.find(b':', cr + 5)
-        q1 = r.content.find(b'"', cl + 1)
-        q2 = r.content.find(b'"', q1 + 1)
-        crumb = r.content[q1 + 1:q2]
+        #cs = r.content.find(b'CrumbStore')
+        cr = r.content.find(b'"crumb":"')
+        q1 = cr + 9
+        q2 = r.content.find(b'"', q1 + 10)
+        crumb = r.content[q1:q2]
 
         # Extract the cookie
-        cookie = self.session.cookies.get('B', domain='.yahoo.com')
+        cookie = self.session.cookies.get('B', domain='.yahoo.com', default='')
         #print(self.session.cookies)
 
         self.session.cookies.clear()
