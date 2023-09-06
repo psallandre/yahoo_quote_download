@@ -15,7 +15,7 @@ setup(
     author='Daniel Lenski',
     author_email='dlenski@gmail.com',
     packages=['yahoo_quote_download'],
-    install_requires=open('requirements.txt').readlines(),
+    install_requires=['requests'],
     entry_points = {
     	'console_scripts': [ 'yqd=yahoo_quote_download.__main__:main' ],
     },
