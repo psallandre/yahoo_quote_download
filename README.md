@@ -2,13 +2,10 @@
 
 Starting on May 2017, Yahoo financial has terminated its service on the well used EOD data download without warning. This is confirmed by Yahoo employee in forum posts.
 
-Yahoo financial EOD data, however, still works on Yahoo financial pages. These download links uses a "crumb" for authentication with a cookie "B". This code is provided to obtain such matching cookie and crumb. This code also downloads end of day stock quote from Yahoo finance.
-
-Once the cookie/crumb is obtained, the querying URL is as following:
+Yahoo financial EOD data, however, still works on Yahoo financial pages. The URLs queried look like this:
 
 ```
-https://query1.finance.yahoo.com/v7/finance/download/TTTT?period1=pppppppp&period2=qqqqqqqq&interval=1d&events=eeeeeeee&crumb=cccccccc
-```
+https://query1.finance.yahoo.com/v7/finance/download/TTTT?period1=pppppppp&period2=qqqqqqqq&interval=1d&events=eeeeeeee```
 
 where
 
@@ -16,7 +13,6 @@ where
 - pppppppp - Period1 is the timestamp (POSIX time stamp) of the beginning date
 - qqqqqqqq - Period2 is the timestamp (POSIX time stamp) of the ending date
 - eeeeeeee - Event, can be one of 'history', 'div', or 'split'
-- cccccccc - Crumb
 
 The CSV file downloaded through the new API has a few data and format differences from the CSV file from the original iChart source. If you plan to use the downloaded data with code that used to process the data from old API, please check your code to make sure that these differences are taken care of.
 
@@ -41,9 +37,6 @@ pip3 install https://github.com/dlenski/yahoo_quote_download/archive/master.zip
 
 # Usage
 
-The first time you run `yqd`, it will extract a cookie/crumb from the web
-application and save it in `~/.yahooquotes`.
-
 See `yqd --help` for complete options list. Example of output in TSV format, only showing the
 latest day's results for each ticker symbol:
 
@@ -61,7 +54,6 @@ It can easily copy output to the clipboard in a form that LibreOffice Calc and E
 
 ```
 $ yqd --tsv --latest FB AAPL AMZN NFLX GOOG | xclip -sel clip
-Got cached cookie_crumb from ~/.yahooquotes
 ```
 
 # License

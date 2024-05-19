@@ -15,16 +15,7 @@ def main():
     p.add_argument('ticker', nargs='+')
     args = p.parse_args()
 
-    try:
-        cookie_crumb = open(os.path.expanduser("~/.yahooquotes")).read().splitlines()
-        print("Got cached cookie_crumb from ~/.yahooquotes", file=sys.stderr)
-    except Exception:
-        cookie_crumb = None
-    yq = YahooQuote(cookie_crumb)
-    if yq.cookie_crumb != cookie_crumb:
-        with open(os.path.expanduser("~/.yahooquotes"), 'w') as f:
-            f.write('\n'.join(yq.cookie_crumb))
-        print("Cached cookie_crumb in ~/.yahooquotes", file=sys.stderr)
+    yq = YahooQuote()
 
     if args.latest:
         begindate, max_rows = None, 1
