@@ -15,7 +15,16 @@ def main():
     p.add_argument('ticker', nargs='+')
     args = p.parse_args()
 
-    yq = YahooQuote()
+    try:
+        crumb, = open(os.path.expanduser("~/.yahooquotes")).read().splitlines()
+        print("Got cached crumb from ~/.yahooquotes", file=sys.stderr)
+    except Exception:
+        crumb = None
+    yq = YahooQuote(crumb)
+    if yq.crumb != crumb:
+        with open(os.path.expanduser("~/.yahooquotes"), 'w') as f:
+            f.write(yq.crumb)
+        print("Cached crumb in ~/.yahooquotes", file=sys.stderr)
 
     if args.latest:
         begindate, max_rows = None, 1

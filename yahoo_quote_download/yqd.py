@@ -18,8 +18,10 @@ the well used EOD data download without warning. This is confirmed
 by Yahoo employee in forum posts.
 
 Yahoo financial EOD data, however, still works on Yahoo financial pages.
+These download links uses a "crumb" for authentication with a cookie "B".
+This code is provided to obtain such matching cookie and crumb.
 '''
-    
+
 default_useragent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
 
 class EventType(Enum):
@@ -28,10 +30,20 @@ class EventType(Enum):
     SPLIT = 'split'
 
 class YahooQuote(object):
-    def __init__(self, cookie_crumb=None, useragent=default_useragent):
+    def __init__(self, crumb=None, useragent=default_useragent):
         self.session = requests.session()
         self.session.headers['User-Agent'] = useragent
         self.session.headers['Accept'] =  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        self.crumb = crumb or self._get_crumb()
+
+    def _get_crumb(self):
+        '''
+        This function perform a query and extract the matching crumb.
+        '''
+
+        r = self.session.get('https://query2.finance.yahoo.com/v1/test/getcrumb')
+        r.raise_for_status()
+        return r.text
 
     def csv(self, tickers, events=EventType.QUOTE, begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7, sep=','):
         if isinstance(tickers, str):
@@ -45,13 +57,11 @@ class YahooQuote(object):
         if begindate is None:
             begindate = now - 86400
 
-        #print(self.session.cookies)
-
         for ii, ticker in enumerate(tickers):
             found = False
             while True:
                 r = self.session.get('https://query1.finance.yahoo.com/v7/finance/download/' + ticker,
-                                     params = dict(period1=begindate, period2=enddate, events=events, interval='1d'))
+                                     params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=self.crumb))
                 if r.ok:
                     break
                 elif r.status_code == 404 and autoextend_days > 0:
@@ -59,7 +69,7 @@ class YahooQuote(object):
                     begindate -= 86400
                     autoextend_days -= 1
                 elif r.status_code == 404:
-                    # ignore
+                    # ignore nonexistent ticker
                     break
                 else:
                     r.raise_for_status()
