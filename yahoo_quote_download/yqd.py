@@ -19,8 +19,8 @@ by Yahoo employee in forum posts.
 
 Yahoo financial EOD data, however, still works on Yahoo financial pages.
 '''
-
-default_useragent = 'Mozilla/5.0 (X11; U; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/117.0'
+    
+default_useragent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0';
 
 class EventType(Enum):
     QUOTE = HISTORY = 'history'
@@ -31,6 +31,7 @@ class YahooQuote(object):
     def __init__(self, cookie_crumb=None, useragent=default_useragent):
         self.session = requests.session()
         self.session.headers['User-Agent'] = useragent
+        self.session.headers['Accept'] =  'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 
     def csv(self, tickers, events=EventType.QUOTE, begindate=None, enddate=None, headers=True, max_rows=1, autoextend_days=7, sep=','):
         if isinstance(tickers, str):
