@@ -9,6 +9,7 @@ Created on Thu May 18 22:58:12 2017
 from __future__ import print_function
 import requests
 import time
+from datetime import datetime, date, timezone, timedelta
 from enum import Enum
 from os.path import expanduser
 
@@ -57,10 +58,10 @@ class YahooQuote(object):
         if begindate is None:
             begindate = now - 86400
 
-        for ii, ticker in enumerate(tickers):
+        for ticker in tickers:
             found = False
             while True:
-                r = self.session.get('https://query1.finance.yahoo.com/v7/finance/download/' + ticker,
+                r = self.session.get('https://query2.finance.yahoo.com/v8/finance/chart/' + ticker,
                                      params = dict(period1=begindate, period2=enddate, events=events, interval='1d', crumb=self.crumb))
                 if r.ok:
                     break
@@ -74,17 +75,25 @@ class YahooQuote(object):
                 else:
                     r.raise_for_status()
             #print(r.cookies, r.url)
-            rows = [row.split(',') for row in r.text.splitlines()]
+
+            result = r.json()['chart']['result'][0]
+            tz = timezone(timedelta(seconds=result['meta']['gmtoffset']), result['meta']['exchangeTimezoneName'])
+            rows = list(zip(
+                [ticker] * len(result['timestamp']),
+                (datetime.fromtimestamp(ts, tz).date() for ts in result['timestamp']),
+                result['indicators']['quote'][0]['open'],
+                result['indicators']['quote'][0]['high'],
+                result['indicators']['quote'][0]['low'],
+                result['indicators']['quote'][0]['close'],
+                result['indicators']['adjclose'][0]['adjclose'],
+                result['indicators']['quote'][0]['volume'],
+            ))
 
             # Remove all-'null' rows that YQ is now sometimes returning
-            rows = [row for jj, row in enumerate(rows) if jj==0 or not all(f in ('null','',None) for f in row[1:])]
+            rows = [row for row in rows if any(f is not None for f in row[2:])]
 
-            for jj, row in enumerate(rows):
-                if jj == 0:
-                    # only include the header row in output once
-                    if headers:
-                        yield sep.join(['Symbol'] + row)+'\n'
-                        headers = False
-                elif max_rows == None or jj>=len(rows)-max_rows:
-                    # limit number of rows to max_rows
-                    yield sep.join([ticker] + row)+'\n'
+            if headers:
+                # only include the header row in output once
+                yield sep.join(['Symbol', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume'])+'\n'
+                headers = False
+            yield from (sep.join(map(str, row))+'\n' for row in rows[-max_rows if max_rows is not None else None:])
