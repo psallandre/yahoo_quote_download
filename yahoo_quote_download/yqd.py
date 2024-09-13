@@ -94,6 +94,6 @@ class YahooQuote(object):
 
             if headers:
                 # only include the header row in output once
-                yield sep.join(['Symbol', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume'])+'\n'
+                yield sep.join(['Symbol', 'Date', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume'])+'\n'
                 headers = False
             yield from (sep.join(map(str, row))+'\n' for row in rows[-max_rows if max_rows is not None else None:])
