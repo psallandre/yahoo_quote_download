@@ -79,7 +79,6 @@ class YahooQuote(object):
             result = r.json()['chart']['result'][0]
             tz = timezone(timedelta(seconds=result['meta']['gmtoffset']), result['meta']['exchangeTimezoneName'])
             rows = list(zip(
-                [ticker] * len(result['timestamp']),
                 (datetime.fromtimestamp(ts, tz).date() for ts in result['timestamp']),
                 result['indicators']['quote'][0]['open'],
                 result['indicators']['quote'][0]['high'],
@@ -94,6 +93,6 @@ class YahooQuote(object):
 
             if headers:
                 # only include the header row in output once
-                yield sep.join(['Symbol', 'Date', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume'])+'\n'
+                yield sep.join(['Date', 'Open', 'High', 'Low', 'Close', 'Adjusted Close', 'Volume'])+'\n'
                 headers = False
             yield from (sep.join(map(str, row))+'\n' for row in rows[-max_rows if max_rows is not None else None:])
