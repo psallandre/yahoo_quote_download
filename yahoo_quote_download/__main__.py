@@ -1,5 +1,6 @@
 import os, sys, time
 import argparse
+from datetime import datetime
 from .yqd import YahooQuote, EventType
 
 def main():
